@@ -7,19 +7,15 @@ pipeline {
             steps {
                  withCredentials([usernamePassword(credentialsId: 'hub.docker.com', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
                     sh '''
-                        env
-                        sg docker -c "
-                            env
-                            git rev-parse --abbrev-ref HEAD | sed -e 's^/^-^g; s^[.]^-^g;' | tr '[:upper:]' '[:lower:]'
-                            docker login -u '${USER}' -p '${PASS}'
-                            export GIT_BRANCH=$GIT_BRANCH
-                            ./e2e-tests/build
-                            docker logout
-                        "
                         DOCKER_TAG=perconalab/percona-server-mongodb-operator:${GIT_BRANCH}
                         docker_tag_file='./results/docker/TAG'
                         mkdir -p $(dirname ${docker_tag_file})
                         echo ${DOCKER_TAG} > "${docker_tag_file}"
+                        sg docker -c "
+                            docker login -u '${USER}' -p '${PASS}'
+                            ./e2e-tests/build
+                            docker logout
+                        "
                     '''
                 }
                 stash includes: 'results/docker/TAG', name: 'IMAGE'

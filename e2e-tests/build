@@ -2,7 +2,7 @@
 
 set -o errexit
 set -o xtrace
-
+#test
 test_dir="$(dirname $0)"
 . $(dirname $0)/functions
 src_dir="$(realpath $test_dir/..)"
@@ -13,10 +13,7 @@ build_operator() {
         $sed -i -e 's^"percona/percona-server-mongodb-operator:"^"perconalab/percona-server-mongodb-operator:"^' ${src_dir}/pkg/psmdb/container.go
         $sed -i -e "s/master/$GIT_BRANCH/" ${src_dir}/version/version.go
     fi
-    repo=$(
-        git config --get remote.origin.url \
-            | sed -e 's^.*github.com[:/]^github.com/^; s/.git$//'
-    )
+    repo='github.com/percona/percona-server-mongodb-operator'
     docker run --rm -v ${src_dir}:/go/src/${repo} golang:1.12 sh -c "
         set -o errexit
         set -o xtrace
